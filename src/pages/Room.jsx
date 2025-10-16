@@ -116,8 +116,13 @@ const Room = () => {
         }
 
         try {
-          sendTransportRef.current =
-            deviceRef.current.createSendTransport(params);
+          sendTransportRef.current = deviceRef.current.createSendTransport({
+            id: params.id,
+            iceParameters: params.iceParameters,
+            iceCandidates: params.iceCandidates,
+            dtlsParameters: params.dtlsParameters,
+            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+          });
 
           sendTransportRef.current.on(
             "connect",
@@ -179,8 +184,15 @@ const Room = () => {
         }
 
         try {
-          recvTransportRef.current =
-            deviceRef.current.createRecvTransport(params);
+          recvTransportRef.current = deviceRef.current.createRecvTransport({
+            id: params.id,
+            iceParameters: params.iceParameters,
+            iceCandidates: params.iceCandidates,
+            dtlsParameters: params.dtlsParameters,
+            iceServers: [
+              { urls: "stun:stun.l.google.com:19302" }
+            ],
+          });
 
           recvTransportRef.current.on(
             "connect",
