@@ -121,7 +121,32 @@ const Room = () => {
             iceParameters: params.iceParameters,
             iceCandidates: params.iceCandidates,
             dtlsParameters: params.dtlsParameters,
-            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+            iceServers: [
+              { urls: "stun:stun.l.google.com:19302" },
+              {
+                urls: "stun:stun.relay.metered.ca:80",
+              },
+              {
+                urls: "turn:global.relay.metered.ca:80",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+              {
+                urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+              {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+              {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+            ],
           });
 
           sendTransportRef.current.on(
@@ -190,7 +215,30 @@ const Room = () => {
             iceCandidates: params.iceCandidates,
             dtlsParameters: params.dtlsParameters,
             iceServers: [
-              { urls: "stun:stun.l.google.com:19302" }
+              { urls: "stun:stun.l.google.com:19302" },
+              {
+                urls: "stun:stun.relay.metered.ca:80",
+              },
+              {
+                urls: "turn:global.relay.metered.ca:80",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+              {
+                urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+              {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
+              {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "95aca473e018df782b488619",
+                credential: "awfVXDT18kWka8ym",
+              },
             ],
           });
 
