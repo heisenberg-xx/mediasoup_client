@@ -11,9 +11,9 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
   const [remoteStreams, setRemoteStreams] = useState([]);
 
   const consume = async (producerId, deviceRef, roomId, name, socketId) => {
+    console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
     const userSocketId = socketId; // use correct socketId
 
-    stream.name = name;
     console.log("[Consume] producerId:", producerId);
     if (!recvTransportRef.current) {
       console.log(
@@ -49,22 +49,24 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
           setRemoteStreams((prev) => [...prev, { userSocketId, stream, name }]);
           console.log("[Remote] new MediaStream created for", userSocketId);
         }
+        stream.name = name;
+
         stream.addTrack(consumer.track);
         console.log("[Remote] track added to MediaStream", consumer.track);
       }
     );
   };
   const removeConsumer = (producerId) => {
-  const consumer = consumersRef.current.get(producerId);
-  if (consumer) {
-    consumer.close();
-    consumersRef.current.delete(producerId);
-  }
-  setRemoteStreams((prev) =>
-    prev.filter((r) => r.userSocketId !== producerId)
-  );
-  streamsMapRef.current.delete(producerId);
-};
+    const consumer = consumersRef.current.get(producerId);
+    if (consumer) {
+      consumer.close();
+      consumersRef.current.delete(producerId);
+    }
+    setRemoteStreams((prev) =>
+      prev.filter((r) => r.userSocketId !== producerId)
+    );
+    streamsMapRef.current.delete(producerId);
+  };
 
   return {
     consumersRef,
@@ -72,7 +74,7 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
     remoteStreams,
     setRemoteStreams,
     consume,
-    removeConsumer
+    removeConsumer,
   };
 };
 export default useConsumers;

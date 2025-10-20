@@ -6,6 +6,7 @@ const useRoomSocket = (
   consume,
   createRecvTransport,
   deviceRef,
+  recvTransportRef,
   roomId
 ) => {
   useEffect(() => {

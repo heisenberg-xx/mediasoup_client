@@ -52,9 +52,12 @@ const Room = () => {
     setParticipants,
     consume,
     createRecvTransport,
+    recvTransportRef,
     deviceRef,
     roomId
   );
+  console.log("Remote", remoteStreams);
+  console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
 
   // Combine local + remote participants with stream info
   const allParticipants = useMemo(() => {
@@ -66,15 +69,19 @@ const Room = () => {
         participants.find((p) => p.socketId === socket.id)?.toggleHand || false,
     };
 
-    const remoteParticipants = remoteStreams.map((r) => {
-      const p = participants.find((p) => p.socketId === r.userSocketId);
-      return {
-        socketId: r.userSocketId,
-        stream: r.stream,
-        name: p?.name || r.name || "Participant",
-        toggleHand: p?.toggleHand || false,
-      };
-    });
+    const remoteParticipants = participants
+      .filter((p) => p.socketId !== socket.id)
+      .map((p) => {
+        const streamObj = remoteStreams.find(
+          (r) => r.userSocketId === p.socketId
+        );
+        return {
+          socketId: p.socketId,
+          stream: streamObj?.stream || null, // null until stream arrives
+          name: p.name,
+          toggleHand: p.toggleHand || false,
+        };
+      });
 
     return [localParticipant, ...remoteParticipants];
   }, [participants, remoteStreams, localStream]);
