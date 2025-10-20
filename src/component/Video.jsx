@@ -1,49 +1,42 @@
 import { useEffect, useRef } from "react";
 
-const Video = ({ stream, name, muted = false }) => {
-  const videoRef = useRef();
+const Video = ({ stream, muted = false }) => {
+  const videoRef = useRef(null);
 
   useEffect(() => {
-    if (!videoRef.current || !stream) return;
+    const videoEl = videoRef.current;
+    if (!videoEl || !stream) return;
 
-    // Assign stream only if it changed
-    if (videoRef.current.srcObject !== stream) {
-      videoRef.current.srcObject = stream;
+    console.log("[Video] Stream assigned:", stream.id || stream);
+
+    if (videoEl.srcObject !== stream) {
+      videoEl.srcObject = stream;
     }
 
     const playVideo = async () => {
       try {
-        await videoRef.current.play();
+        await videoEl.play();
       } catch (err) {
-        console.warn("Video autoplay prevented:", err);
+        console.warn("[Video] Autoplay prevented:", err.message);
       }
     };
 
     playVideo();
 
+    // Cleanup safely
     return () => {
-      // Optional cleanup: remove tracks if component unmounts
-      videoRef.current.srcObject = null;
+      if (videoEl) videoEl.srcObject = null;
     };
   }, [stream]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted={muted} // muted for local video
-        style={{
-          width: 300,
-          height: 200,
-          borderRadius: 8,
-          border: "1px solid gray",
-          backgroundColor: "black",
-        }}
-      />
-      {name && <span style={{ color: "white", marginTop: 4 }}>{name}</span>}
-    </div>
+    <video
+      ref={videoRef}
+      muted={muted}
+      autoPlay
+      playsInline
+      className="w-full h-full object-cover rounded-lg"
+    />
   );
 };
 
