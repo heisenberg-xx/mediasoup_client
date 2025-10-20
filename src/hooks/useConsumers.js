@@ -10,7 +10,10 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
   const streamsMapRef = useRef(new Map());
   const [remoteStreams, setRemoteStreams] = useState([]);
 
-  const consume = async (producerId, deviceRef, roomId) => {
+  const consume = async (producerId, deviceRef, roomId, name, socketId) => {
+    const userSocketId = socketId; // use correct socketId
+
+    stream.name = name;
     console.log("[Consume] producerId:", producerId);
     if (!recvTransportRef.current) {
       console.log(
@@ -39,15 +42,11 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
         await consumer.resume();
         console.log("[Consume] consumer resumed");
         consumersRef.current.set(producerId, consumer);
-        const userSocketId = params.socketId || producerId;
         let stream = streamsMapRef.current.get(userSocketId);
         if (!stream) {
           stream = new MediaStream();
           streamsMapRef.current.set(userSocketId, stream);
-          setRemoteStreams((prev) => [
-            ...prev,
-            { userSocketId, stream, name: `Remote ${userSocketId.slice(-4)}` },
-          ]);
+          setRemoteStreams((prev) => [...prev, { userSocketId, stream, name }]);
           console.log("[Remote] new MediaStream created for", userSocketId);
         }
         stream.addTrack(consumer.track);
@@ -55,6 +54,17 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
       }
     );
   };
+  const removeConsumer = (producerId) => {
+  const consumer = consumersRef.current.get(producerId);
+  if (consumer) {
+    consumer.close();
+    consumersRef.current.delete(producerId);
+  }
+  setRemoteStreams((prev) =>
+    prev.filter((r) => r.userSocketId !== producerId)
+  );
+  streamsMapRef.current.delete(producerId);
+};
 
   return {
     consumersRef,
@@ -62,6 +72,7 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
     remoteStreams,
     setRemoteStreams,
     consume,
+    removeConsumer
   };
 };
 export default useConsumers;

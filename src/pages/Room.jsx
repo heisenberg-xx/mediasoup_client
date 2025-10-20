@@ -36,41 +36,48 @@ const Room = () => {
     createSendTransport,
     createRecvTransport,
   } = useTransports(deviceRef, waitDeviceLoaded, roomId);
-  const { shareCam,stopCam } = useProducers(
-    deviceRef,
-    sendTransportRef,
-    waitDeviceLoaded,
-    setMicOn,
-    setCameraOn,
-    createSendTransport,
-    setLocalStream,
-    
-  );
+  const { shareCam, stopCam, audioProducerRef, videoProducerRef } =
+    useProducers(
+      deviceRef,
+      sendTransportRef,
+      waitDeviceLoaded,
+      setMicOn,
+      setCameraOn,
+      createSendTransport,
+      setLocalStream
+    );
   const { consumersRef, remoteStreams, setRemoteStreams, consume } =
     useConsumers(createRecvTransport, recvTransportRef);
-useRoomSocket(setParticipants, consume, createRecvTransport, deviceRef, roomId);
+  useRoomSocket(
+    setParticipants,
+    consume,
+    createRecvTransport,
+    deviceRef,
+    roomId
+  );
 
   // Combine local + remote participants with stream info
-const allParticipants = useMemo(() => {
-  const localParticipant = {
-    socketId: socket.id,
-    stream: localStream,
-    name: participants.find((p) => p.socketId === socket.id)?.name || "You",
-    toggleHand: participants.find((p) => p.socketId === socket.id)?.toggleHand || false,
-  };
-
-  const remoteParticipants = remoteStreams.map((r) => {
-    const p = participants.find((p) => p.socketId === r.userSocketId);
-    return {
-      socketId: r.userSocketId,
-      stream: r.stream,
-      name: p?.name || r.name || "Participant",
-      toggleHand: p?.toggleHand || false,
+  const allParticipants = useMemo(() => {
+    const localParticipant = {
+      socketId: socket.id,
+      stream: localStream,
+      name: participants.find((p) => p.socketId === socket.id)?.name || "You",
+      toggleHand:
+        participants.find((p) => p.socketId === socket.id)?.toggleHand || false,
     };
-  });
 
-  return [localParticipant, ...remoteParticipants];
-}, [participants, remoteStreams, localStream]);
+    const remoteParticipants = remoteStreams.map((r) => {
+      const p = participants.find((p) => p.socketId === r.userSocketId);
+      return {
+        socketId: r.userSocketId,
+        stream: r.stream,
+        name: p?.name || r.name || "Participant",
+        toggleHand: p?.toggleHand || false,
+      };
+    });
+
+    return [localParticipant, ...remoteParticipants];
+  }, [participants, remoteStreams, localStream]);
 
   console.table(participants);
   console.log(remoteStreams);
@@ -85,21 +92,60 @@ const allParticipants = useMemo(() => {
     navigate("/");
   };
 
-const toggleCamera = async () => {
-  console.log("[Action] toggleCamera");
+  // const toggleCamera = async () => {
+  //   console.log("[Action] toggleCamera");
 
-  if (!cameraOn) {
-    await shareCam(localRef); // turn on camera
-  } else {
-    await stopCam(localRef); // turn off camera safely
-  }
-};
+  //   if (!cameraOn) {
+  //     await shareCam(localRef); // turn on camera
+  //   } else {
+  //     await stopCam(localRef); // turn off camera safely
+  //   }
+  // };
 
+  //   const toggleMic = async () => {
+  //     console.log("[Action] toggleMic");
+  //     if (!micOn) await shareCam(localRef);
+  //     else setMicOn((v) => !v);
+  //   };
 
   const toggleMic = async () => {
     console.log("[Action] toggleMic");
-    if (!micOn) await shareCam(localRef);
-    else setMicOn((v) => !v);
+
+    if (!audioProducerRef.current) {
+      // If no producer exists, start sharing
+      await shareCam(localRef);
+    } else {
+      // Mute/unmute using the producer
+      if (audioProducerRef.current.paused) {
+        await audioProducerRef.current.resume();
+        setMicOn(true);
+        console.log("[Mic] resumed");
+      } else {
+        await audioProducerRef.current.pause();
+        setMicOn(false);
+        console.log("[Mic] paused");
+      }
+    }
+  };
+
+  const toggleCamera = async () => {
+    console.log("[Action] toggleCamera");
+
+    if (!videoProducerRef.current) {
+      // If no producer exists, start sharing
+      await shareCam(localRef);
+    } else {
+      // Mute/unmute using the producer
+      if (videoProducerRef.current.paused) {
+        await videoProducerRef.current.resume();
+        setCameraOn(true);
+        console.log("[Camera] resumed");
+      } else {
+        await videoProducerRef.current.pause();
+        setCameraOn(false);
+        console.log("[Camera] paused");
+      }
+    }
   };
 
   const handleRaiseHand = () => {

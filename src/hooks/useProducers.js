@@ -77,43 +77,50 @@ const useProducers = (
     }
   };
   const stopCam = async (localRef) => {
-  try {
-    console.log("stopCam called");
+    try {
+      console.log("stopCam called");
 
-    if (videoProducerRef.current) {
-      await videoProducerRef.current.close();
-      console.log("[Producer] video producer closed");
-      videoProducerRef.current = null;
+      if (videoProducerRef.current) {
+        await videoProducerRef.current.close();
+        console.log("[Producer] video producer closed");
+        videoProducerRef.current = null;
+      }
+
+      if (audioProducerRef.current) {
+        await audioProducerRef.current.close();
+        console.log("[Producer] audio producer closed");
+        audioProducerRef.current = null;
+      }
+
+      const stream = localRef.current?.srcObject;
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+
+      if (localRef.current) {
+        localRef.current.srcObject = null;
+      }
+
+      setCameraOn(false);
+      setMicOn(false);
+      setLocalStream(null);
+
+      console.log("[Local] Camera stopped and hardware released");
+    } catch (err) {
+      console.error("[stopCam] error:", err);
     }
+  };
 
-    if (audioProducerRef.current) {
-      await audioProducerRef.current.close();
-      console.log("[Producer] audio producer closed");
-      audioProducerRef.current = null;
-    }
-
-    const stream = localRef.current?.srcObject;
-    if (stream) {
-      stream.getTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-
-    if (localRef.current) {
-      localRef.current.srcObject = null;
-    }
-
-    setCameraOn(false);
-    setMicOn(false);
-    setLocalStream(null);
-
-    console.log("[Local] Camera stopped and hardware released");
-  } catch (err) {
-    console.error("[stopCam] error:", err);
-  }
-};
-
-  return { shareCam, audioTrackRef, stopCam,videoTrackRef };
+  return {
+    shareCam,
+    audioTrackRef,
+    stopCam,
+    videoTrackRef,
+    audioProducerRef,
+    videoProducerRef,
+  };
 };
 
 export default useProducers;

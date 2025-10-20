@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { socket } from "../socket/socket";
 
-const useRoomSocket = (setParticipants, consume, createRecvTransport, deviceRef, roomId) => {
+const useRoomSocket = (
+  setParticipants,
+  consume,
+  createRecvTransport,
+  deviceRef,
+  roomId
+) => {
   useEffect(() => {
     socket.on("room_participants", (list) => {
       console.log("[Socket] room_participants:", list);
@@ -15,16 +21,26 @@ const useRoomSocket = (setParticipants, consume, createRecvTransport, deviceRef,
       );
     });
 
-    socket.on("new-producer", async ({ producerId }) => {
+    socket.on("new-producer", async ({ producerId, name, socketId }) => {
       console.log("[Socket] new-producer:", producerId);
-      await createRecvTransport();
-      await consume(producerId, deviceRef, roomId);
+
+      if (!deviceRef.current || !recvTransportRef.current) {
+        await createRecvTransport(); // only create if not already
+      }
+
+      await consume(producerId, deviceRef, roomId, name, socketId);
     });
 
-    socket.on("all-producers", async (producerIds) => {
-      console.log("[Socket] all-producers:", producerIds);
-      await createRecvTransport();
-      for (const id of producerIds) await consume(id, deviceRef, roomId);
+    socket.on("all-producers", async (producers) => {
+      console.log("[Socket] all-producers:", producers);
+
+      if (!deviceRef.current || !recvTransportRef.current) {
+        await createRecvTransport();
+      }
+
+      for (const { id, name, socketId } of producers) {
+        await consume(id, deviceRef, roomId, name, socketId);
+      }
     });
 
     return () => {
