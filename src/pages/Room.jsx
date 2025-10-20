@@ -48,31 +48,30 @@ const Room = () => {
   );
   const { consumersRef, remoteStreams, setRemoteStreams, consume } =
     useConsumers(createRecvTransport, recvTransportRef);
-  useRoomSocket(setParticipants, consume, createRecvTransport);
+useRoomSocket(setParticipants, consume, createRecvTransport, deviceRef, roomId);
 
   // Combine local + remote participants with stream info
-  const allParticipants = useMemo(() => {
-    // Combine local + remote participants
-    const localParticipant = {
-      socketId: socket.id,
-      stream: localStream, // might be null initially
-      name: participants.find((p) => p.socketId === socket.id)?.name || "You",
-      toggleHand:
-        participants.find((p) => p.socketId === socket.id)?.toggleHand || false,
+const allParticipants = useMemo(() => {
+  const localParticipant = {
+    socketId: socket.id,
+    stream: localStream,
+    name: participants.find((p) => p.socketId === socket.id)?.name || "You",
+    toggleHand: participants.find((p) => p.socketId === socket.id)?.toggleHand || false,
+  };
+
+  const remoteParticipants = remoteStreams.map((r) => {
+    const p = participants.find((p) => p.socketId === r.userSocketId);
+    return {
+      socketId: r.userSocketId,
+      stream: r.stream,
+      name: p?.name || r.name || "Participant",
+      toggleHand: p?.toggleHand || false,
     };
+  });
 
-    const remoteParticipants = remoteStreams.map((r) => {
-      const p = participants.find((p) => p.socketId === r.userSocketId);
-      return {
-        socketId: r.userSocketId,
-        stream: r.stream || null, // might be null if remote hasn't shared camera yet
-        name: p?.name || r.name || "Participant",
-        toggleHand: p?.toggleHand || false,
-      };
-    });
+  return [localParticipant, ...remoteParticipants];
+}, [participants, remoteStreams, localStream]);
 
-    return [localParticipant, ...remoteParticipants];
-  }, [participants, remoteStreams, localStream]);
   console.table(participants);
   console.log(remoteStreams);
 
@@ -86,20 +85,16 @@ const Room = () => {
     navigate("/");
   };
 
-  const toggleCamera = async () => {
-    console.log("[Action] toggleCamera");
-    if (!cameraOn) {
-      await shareCam(localRef);
-    } else {
-      // turn off camera
-      const stream = localRef.current?.srcObject;
-      stopCam(localRef);
-      stream?.getTracks().forEach((t) => t.stop());
-      localRef.current.srcObject = null;
-      setLocalStream(null);
-      setCameraOn(false);
-    }
-  };
+const toggleCamera = async () => {
+  console.log("[Action] toggleCamera");
+
+  if (!cameraOn) {
+    await shareCam(localRef); // turn on camera
+  } else {
+    await stopCam(localRef); // turn off camera safely
+  }
+};
+
 
   const toggleMic = async () => {
     console.log("[Action] toggleMic");
