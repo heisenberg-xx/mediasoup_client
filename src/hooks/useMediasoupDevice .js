@@ -8,17 +8,17 @@ const useMediasoupDevice = () => {
 
   useEffect(() => {
     socket.on("router-rtp-capabilities", async (rtpCapabilities) => {
-      console.log("[Socket] router-rtp-capabilities:", rtpCapabilities);
+      // console.log("[Socket] router-rtp-capabilities:", rtpCapabilities);
       try {
         deviceRef.current = new mediasoupClient.Device();
         await deviceRef.current.load({
           routerRtpCapabilities: rtpCapabilities,
         });
-        console.log(
-          "Device loaded successfully 18",
+        // console.log(
+        //   "Device loaded successfully 18",
          
-          deviceRef.current.rtpCapabilities
-        );
+        //   deviceRef.current.rtpCapabilities
+        // );
         setDeviceLoaded(true);
         deviceLoadedRef.current = true;
       } catch (err) {

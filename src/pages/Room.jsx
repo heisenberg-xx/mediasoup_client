@@ -47,19 +47,19 @@ const Room = () => {
       setLocalStream
     );
   const { consumersRef, remoteStreams, setRemoteStreams, consume } =
-    useConsumers(createRecvTransport, recvTransportRef,waitDeviceLoaded);
+    useConsumers(createRecvTransport, recvTransportRef, waitDeviceLoaded);
   useRoomSocket(
-  setParticipants,
-  consume,
-  createRecvTransport,
-  deviceRef,
-  recvTransportRef,
-  waitDeviceLoaded,
-  roomId
-);
+    setParticipants,
+    consume,
+    createRecvTransport,
+    deviceRef,
+    recvTransportRef,
+    waitDeviceLoaded,
+    roomId
+  );
 
-  console.log("Remote", remoteStreams);
-  console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
+  // console.log("Remote", remoteStreams);
+  // console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
 
   // Combine local + remote participants with stream info
   const allParticipants = useMemo(() => {
@@ -88,15 +88,16 @@ const Room = () => {
     return [localParticipant, ...remoteParticipants];
   }, [participants, remoteStreams, localStream]);
 
-  console.table(participants);
-  console.log(remoteStreams);
+  // console.table(participants);
+  // console.log(remoteStreams);
 
-  console.table("allpaticipants", allParticipants);
+  // console.table("allpaticipants", allParticipants);
 
-  const handleLeave = () => {
+  const handleLeave = async () => {
     console.log("[Action] Leave Room");
     consumersRef.current.forEach((c) => c.close());
     consumersRef.current.clear();
+    await stopCam(localRef);
     socket.emit("leave_room", { roomId });
     navigate("/");
   };
@@ -170,20 +171,31 @@ const Room = () => {
       <div className="grid md:grid-cols-3 grid-cols-2 md:gap-4 gap-2 mb-8 w-full px-2">
         {allParticipants.map(({ socketId, stream, name, toggleHand }) => {
           const bgColor = getRandomTailwindColor();
+          const isLocal = socketId === socket.id;
+          const hasActiveVideo = stream
+            ?.getVideoTracks()
+            .some((track) => track.enabled);
+          // console.log({hasActiveVideo})
+          const showVideo = hasActiveVideo || (isLocal && cameraOn);
           return (
             <div
               key={socketId}
-              className={`relative rounded-lg overflow-hidden shadow-md border border-gray-300 bg-black select-none col-span-1 h-60`}
+              className={`relative z-5 rounded-lg overflow-hidden shadow-md border border-gray-300 bg-black select-none col-span-1 h-60`}
             >
+              {toggleHand && (
+                <span className="absolute bottom-0 z-20">
+                  {" "}
+                  <Hand fill="#00FF00" size={30} strokeWidth={1.2} />
+                </span>
+              )}
               {/* Video component */}
-              {stream ? (
+              {showVideo ? (
                 <Video stream={stream} muted={socketId === socket.id} />
               ) : (
                 <div
-                  className={`absolute bottom-0 left-0 right-0 ${bgColor} bg-opacity-50 text-white px-3 py-1 flex justify-center items-center text-sm font-semibold w-full h-full  `}
+                  className={`absolute bottom-0 z-10 left-0 right-0 ${bgColor} bg-opacity-50 text-white px-3 py-1 flex justify-center items-center text-sm font-semibold w-full h-full  `}
                 >
                   <span className="text-center">{name}</span>
-                  {toggleHand && <span>👌</span>}
                 </div>
               )}
             </div>
@@ -207,7 +219,7 @@ const Room = () => {
           } text-white`}
         >
           {micOn ? <MicOff /> : <Mic />}
-         <span className="md:flex hidden"> {micOn ? "Mute" : "Unmute"}</span>
+          <span className="md:flex hidden"> {micOn ? "Mute" : "Unmute"}</span>
         </button>
         <button
           onClick={toggleCamera}
@@ -216,7 +228,10 @@ const Room = () => {
           } text-white`}
         >
           {!cameraOn ? <VideoIcon /> : <VideoOff />}
-          <span className="md:flex hidden"> {cameraOn ? "Camera Off" : "Camera On"}</span>
+          <span className="md:flex hidden">
+            {" "}
+            {cameraOn ? "Camera Off" : "Camera On"}
+          </span>
         </button>
         <button
           onClick={handleRaiseHand}

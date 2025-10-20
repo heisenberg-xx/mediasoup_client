@@ -12,7 +12,7 @@ const useRoomSocket = (
 ) => {
   useEffect(() => {
     socket.on("room_participants", (list) => {
-      console.log("[Socket] room_participants:", list);
+      // console.log("[Socket] room_participants:", list);
       setParticipants(list);
     });
 

@@ -7,7 +7,7 @@ const Video = ({ stream, muted = false }) => {
     const videoEl = videoRef.current;
     if (!videoEl || !stream) return;
 
-    console.log("[Video] Stream assigned:", stream.id || stream);
+    // console.log("[Video] Stream assigned:", stream.id || stream);
 
     if (videoEl.srcObject !== stream) {
       videoEl.srcObject = stream;
@@ -35,7 +35,7 @@ const Video = ({ stream, muted = false }) => {
       muted={muted}
       autoPlay
       playsInline
-      className="w-full h-full object-cover rounded-lg"
+      className="w-full h-full object-cover rounded-lg z-10"
     />
   );
 };

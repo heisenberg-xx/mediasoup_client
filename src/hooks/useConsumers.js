@@ -11,10 +11,10 @@ const useConsumers = (createRecvTransport, recvTransportRef,waitDeviceLoaded) =>
   const [remoteStreams, setRemoteStreams] = useState([]);
 
   const consume = async (producerId, deviceRef, roomId, name, socketId) => {
-    console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
+    // console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
     const userSocketId = socketId; // use correct socketId
 
-    console.log("[Consume] producerId:", producerId);
+    // console.log("[Consume] producerId:", producerId);
      await waitDeviceLoaded();
     if (!recvTransportRef.current) {
       console.log(
@@ -24,7 +24,7 @@ const useConsumers = (createRecvTransport, recvTransportRef,waitDeviceLoaded) =>
       recvTransportRef.current = transport;
     }
 
-    console.log("Hey I am In console",deviceRef.current.rtpCapabilities)
+    // console.log("Hey I am In console",deviceRef.current.rtpCapabilities)
     socket.emit(
       "consume",
       {
@@ -35,7 +35,7 @@ const useConsumers = (createRecvTransport, recvTransportRef,waitDeviceLoaded) =>
       async (params) => {
         if (params.error)
           return console.error("[Consume] error:", params.error);
-        console.log("[Consume] params received:", params);
+        // console.log("[Consume] params received:", params);
         const consumer = await recvTransportRef.current.consume({
           id: params.id,
           producerId: params.producerId,
@@ -50,12 +50,12 @@ const useConsumers = (createRecvTransport, recvTransportRef,waitDeviceLoaded) =>
           stream = new MediaStream();
           streamsMapRef.current.set(userSocketId, stream);
           setRemoteStreams((prev) => [...prev, { userSocketId, stream, name }]);
-          console.log("[Remote] new MediaStream created for", userSocketId);
+          // console.log("[Remote] new MediaStream created for", userSocketId);
         }
         stream.name = name;
 
         stream.addTrack(consumer.track);
-        console.log("[Remote] track added to MediaStream", consumer.track);
+        // console.log("[Remote] track added to MediaStream", consumer.track);
       }
     );
   };

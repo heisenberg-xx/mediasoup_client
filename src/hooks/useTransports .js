@@ -13,7 +13,7 @@ const useTransports = (deviceRef, waitDeviceLoaded, roomId) => {
     await waitDeviceLoaded();
     return new Promise((resolve, reject) => {
       socket.emit("create-send-transport", { roomId }, async (params) => {
-        console.log("[Transport] sendTransport params:", params);
+        // console.log("[Transport] sendTransport params:", params);
         if (params.error) return reject(new Error(params.error));
         try {
           sendTransportRef.current = deviceRef.current.createSendTransport({
@@ -27,7 +27,7 @@ const useTransports = (deviceRef, waitDeviceLoaded, roomId) => {
           sendTransportRef.current.on(
             "connect",
             ({ dtlsParameters }, callback, errback) => {
-              console.log("[SendTransport] connecting...");
+              // console.log("[SendTransport] connecting...");
               socket.emit(
                 "connect-transport",
                 { transportId: sendTransportRef.current.id, dtlsParameters },
@@ -36,7 +36,7 @@ const useTransports = (deviceRef, waitDeviceLoaded, roomId) => {
                     console.error("[SendTransport] connect error:", res.error);
                     errback(new Error(res.error));
                   } else {
-                    console.log("[SendTransport] connected successfully");
+                    // console.log("[SendTransport] connected successfully");
                     callback();
                   }
                 }
@@ -47,7 +47,7 @@ const useTransports = (deviceRef, waitDeviceLoaded, roomId) => {
           sendTransportRef.current.on(
             "produce",
             ({ kind, rtpParameters }, callback, errback) => {
-              console.log("[SendTransport] produce event:", kind);
+              // console.log("[SendTransport] produce event:", kind);
               socket.emit(
                 "produce",
                 { roomId, kind, rtpParameters },
@@ -79,7 +79,7 @@ const useTransports = (deviceRef, waitDeviceLoaded, roomId) => {
     await waitDeviceLoaded();
     return new Promise((resolve, reject) => {
       socket.emit("create-recv-transport", { roomId }, (params) => {
-        console.log("[Transport] recvTransport params:", params);
+        // console.log("[Transport] recvTransport params:", params);
         if (params.error) return reject(new Error(params.error));
         try {
           recvTransportRef.current = deviceRef.current.createRecvTransport({
