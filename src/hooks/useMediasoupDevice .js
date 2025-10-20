@@ -14,7 +14,11 @@ const useMediasoupDevice = () => {
         await deviceRef.current.load({
           routerRtpCapabilities: rtpCapabilities,
         });
-        console.log("Device loaded successfully",rtpCapabilities,deviceRef.current);
+        console.log(
+          "Device loaded successfully 18",
+         
+          deviceRef.current.rtpCapabilities
+        );
         setDeviceLoaded(true);
         deviceLoadedRef.current = true;
       } catch (err) {
@@ -42,4 +46,4 @@ const useMediasoupDevice = () => {
   return { deviceRef, deviceLoaded, deviceLoadedRef, waitDeviceLoaded };
 };
 
-export default useMediasoupDevice
+export default useMediasoupDevice;

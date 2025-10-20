@@ -5,7 +5,7 @@ import { getFirstLetter, getRandomTailwindColor } from "../utils/utils";
 import * as mediasoupClient from "mediasoup-client";
 import Video from "../component/Video";
 
-const useConsumers = (createRecvTransport, recvTransportRef) => {
+const useConsumers = (createRecvTransport, recvTransportRef,waitDeviceLoaded) => {
   const consumersRef = useRef(new Map());
   const streamsMapRef = useRef(new Map());
   const [remoteStreams, setRemoteStreams] = useState([]);
@@ -15,6 +15,7 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
     const userSocketId = socketId; // use correct socketId
 
     console.log("[Consume] producerId:", producerId);
+     await waitDeviceLoaded();
     if (!recvTransportRef.current) {
       console.log(
         "[Consume] recvTransportRef.current missing — creating now..."

@@ -7,6 +7,7 @@ const useRoomSocket = (
   createRecvTransport,
   deviceRef,
   recvTransportRef,
+  waitDeviceLoaded,
   roomId
 ) => {
   useEffect(() => {
@@ -28,6 +29,10 @@ const useRoomSocket = (
       if (!deviceRef.current || !recvTransportRef.current) {
         await createRecvTransport(); // only create if not already
       }
+      console.log(
+        "Device Ref Use Room Scoekt",
+        deviceRef.current.rtpCapabilities
+      );
 
       await consume(producerId, deviceRef, roomId, name, socketId);
     });

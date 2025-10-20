@@ -47,15 +47,17 @@ const Room = () => {
       setLocalStream
     );
   const { consumersRef, remoteStreams, setRemoteStreams, consume } =
-    useConsumers(createRecvTransport, recvTransportRef);
+    useConsumers(createRecvTransport, recvTransportRef,waitDeviceLoaded);
   useRoomSocket(
-    setParticipants,
-    consume,
-    createRecvTransport,
-    recvTransportRef,
-    deviceRef,
-    roomId
-  );
+  setParticipants,
+  consume,
+  createRecvTransport,
+  deviceRef,
+  recvTransportRef,
+  waitDeviceLoaded,
+  roomId
+);
+
   console.log("Remote", remoteStreams);
   console.log("🚀 roomId:", roomId, "typeof roomId:", typeof roomId);
 
@@ -162,16 +164,16 @@ const Room = () => {
   };
 
   return (
-    <div className="space-y-5 mt-20 px-4">
+    <div className=" md:mt-20 md:px-5 mt-5 mx-auto w-full ">
       <h2 className="text-xl font-semibold mb-4">Room: {roomId}</h2>
 
-      <div className="grid grid-cols-3 gap-4 mb-8 w-screen">
+      <div className="grid md:grid-cols-3 grid-cols-2 md:gap-4 gap-2 mb-8 w-full px-2">
         {allParticipants.map(({ socketId, stream, name, toggleHand }) => {
           const bgColor = getRandomTailwindColor();
           return (
             <div
               key={socketId}
-              className={`relative rounded-lg overflow-hidden shadow-md border border-gray-300 bg-black select-none w-full h-60`}
+              className={`relative rounded-lg overflow-hidden shadow-md border border-gray-300 bg-black select-none col-span-1 h-60`}
             >
               {/* Video component */}
               {stream ? (
@@ -205,7 +207,7 @@ const Room = () => {
           } text-white`}
         >
           {micOn ? <MicOff /> : <Mic />}
-          {micOn ? "Mute" : "Unmute"}
+         <span className="md:flex hidden"> {micOn ? "Mute" : "Unmute"}</span>
         </button>
         <button
           onClick={toggleCamera}
@@ -214,16 +216,16 @@ const Room = () => {
           } text-white`}
         >
           {!cameraOn ? <VideoIcon /> : <VideoOff />}
-          {cameraOn ? "Camera Off" : "Camera On"}
+          <span className="md:flex hidden"> {cameraOn ? "Camera Off" : "Camera On"}</span>
         </button>
         <button
           onClick={handleRaiseHand}
           className="px-4 py-1 rounded bg-white/20 text-black text-lg gap-2 transition-all duration-200 hover:scale-[1.05]"
         >
           {isHandRaised ? (
-            <Hand className="text-white" size={30} strokeWidth={1.2} />
-          ) : (
             <Hand fill="#00FF00" size={30} strokeWidth={1.2} />
+          ) : (
+            <Hand className="text-white" size={30} strokeWidth={1.2} />
           )}
         </button>
         <button
