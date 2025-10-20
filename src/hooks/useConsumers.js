@@ -22,6 +22,8 @@ const useConsumers = (createRecvTransport, recvTransportRef) => {
       const transport = await createRecvTransport();
       recvTransportRef.current = transport;
     }
+
+    console.log("Hey I am In console",deviceRef.current.rtpCapabilities)
     socket.emit(
       "consume",
       {
