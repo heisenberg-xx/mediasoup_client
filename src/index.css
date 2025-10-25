@@ -16,4 +16,23 @@
   font-weight: 400;
   font-style: normal;
 }
+@font-face {
+  font-family: "Arenia";
+  src: url("./assets/font/Arenia.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 
+@theme {
+  --color-primary: #66ad39;
+  --color-secondary: #333333;
+  --color-text-main: #fafafa;
+  --color-text-sub: #d9d9d9;
+  --color-text-deepdub: #8c8c8c;
+}
+
+@layer utilities{
+  .font-title{
+    font-family: 'Arenia', sans-serif;
+  }
+}

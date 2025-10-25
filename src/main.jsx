@@ -5,7 +5,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.jsx";
 import Room from "./pages/Room.jsx";
 import JoinRoom from "./pages/JoinRoom.jsx";
-import './index.css'
+import "./index.css";
+import CreateRoom from "./pages/CreateRoom.jsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const router = createBrowserRouter([
   {
@@ -14,18 +16,25 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <CreateRoom />,
+      },
+      {
+        path: "join-session/:id",
         element: <JoinRoom />,
       },
       {
-        path: "room/:id",
+        path: "session/:id",
         element: <Room />,
       },
     ],
   },
 ]);
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </React.StrictMode>
 );
