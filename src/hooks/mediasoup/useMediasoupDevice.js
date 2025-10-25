@@ -1,6 +1,6 @@
 import * as mediasoupClient from "mediasoup-client";
-import { socket } from "../socket/socket";
 import { useEffect, useRef, useState } from "react";
+import { socket } from "../../socket/socket";
 const useMediasoupDevice = () => {
   const deviceRef = useRef(null);
   const deviceLoadedRef = useRef(false);

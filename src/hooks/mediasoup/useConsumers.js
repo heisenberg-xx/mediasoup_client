@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { socket } from "../socket/socket";
-import { useNavigate, useParams } from "react-router";
-import { getFirstLetter, getRandomTailwindColor } from "../utils/utils";
-import * as mediasoupClient from "mediasoup-client";
-import Video from "../component/Video";
+import { socket } from "../../socket/socket";
+
 
 const useConsumers = (createRecvTransport, recvTransportRef,waitDeviceLoaded) => {
   const consumersRef = useRef(new Map());

@@ -1,9 +1,15 @@
+import { Toaster } from "react-hot-toast";
 import { Outlet } from "react-router";
+import Header from "./component/Header";
 
 const App = () => {
   return (
-    <main className="bg-[#353535] min-h-screen flex w-screen  justify-center md:items-center poppins-regular px-5">
-      <Outlet />
+    <main className="bg-secondary min-h-screen flex flex-col w-screen   poppins-regular px-5">
+      <Header />
+      <div className="w-full flex items-center justify-center">
+        <Outlet />
+      </div>
+      <Toaster />
     </main>
   );
 };
