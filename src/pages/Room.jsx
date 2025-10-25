@@ -16,9 +16,11 @@ import {
   Unplug,
   MonitorUp,
   MonitorX,
+  Share2,
 } from "lucide-react";
 import useMediasoupDevice from "../hooks/mediasoup/useMediasoupDevice";
 import useTransports from "../hooks/mediasoup/useTransports";
+import ShareModal from "../component/ShareModel";
 
 // ✅ ParticipantTile safely uses hooks
 const ParticipantTile = ({ participant, isLocal, cameraOn, colorMap }) => {
@@ -64,6 +66,7 @@ const Room = () => {
   const [isHandRaised, setIsHandRaised] = useState(false);
   const [localStream, setLocalStream] = useState(null);
   const [screenSharing, setScreenSharing] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const localRef = useRef();
   const screenLocalRef = useRef();
@@ -254,9 +257,15 @@ const Room = () => {
         {/* Bottom controls */}
         <div className="flex gap-3 fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black/40 rounded px-6 py-3 shadow-lg backdrop-blur">
           <button
+            onClick={() => setShowShareModal(true)}
+            className="flex items-center px-4 py-1 rounded text-lg gap-2 bg-white/20 text-white transition-all duration-200"
+          >
+            <Share2 size={20} /> 
+          </button>
+          <button
             onClick={toggleMic}
             className={`flex items-center px-4 py-1 rounded text-lg gap-2 transition-all duration-200 ${
-              micOn ? "bg-green-500" : "bg-gray-500"
+              micOn ? "bg-green-500" : "bg-white/20"
             } text-white`}
           >
             {micOn ? <MicOff /> : <Mic />}
@@ -265,7 +274,7 @@ const Room = () => {
           <button
             onClick={toggleCamera}
             className={`flex items-center px-4 py-1 rounded text-lg gap-2 transition-all duration-200 ${
-              cameraOn ? "bg-blue-500" : "bg-gray-500"
+              cameraOn ? "bg-blue-500" : "bg-white/20"
             } text-white`}
           >
             {!cameraOn ? <VideoIcon /> : <VideoOff />}
@@ -294,6 +303,9 @@ const Room = () => {
             <Unplug /> Leave
           </button>
         </div>
+        {showShareModal && (
+          <ShareModal sessionId={roomId} onClose={() => setShowShareModal(false)} />
+        )}
       </div>
     </div>
   );
